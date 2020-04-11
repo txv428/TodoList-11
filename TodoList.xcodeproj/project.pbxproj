@@ -39,6 +39,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		18DBA7EE2441A2730047A7EF /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				18DBA7EC2441A1FE0047A7EF /* TodoListModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		18DE37D6243FF0CA00BDB6A8 = {
 			isa = PBXGroup;
 			children = (
@@ -65,7 +73,7 @@
 				18DE37EB243FF0CC00BDB6A8 /* Assets.xcassets */,
 				18DE37ED243FF0CC00BDB6A8 /* LaunchScreen.storyboard */,
 				18DE37F0243FF0CC00BDB6A8 /* Info.plist */,
-				18DBA7EC2441A1FE0047A7EF /* TodoListModel.swift */,
+				18DBA7EE2441A2730047A7EF /* Model */,
 			);
 			path = TodoList;
 			sourceTree = "<group>";
