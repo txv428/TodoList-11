@@ -10,21 +10,20 @@ import UIKit
 
 class ToDoTableViewController: UITableViewController {
     
-    var itemArray = ["Find Mike", "Buy Eggs", "Destroy Demogorgon"]
-    let defaults = UserDefaults.standard
+//    var itemArray = ["Find Mike", "Buy Eggs", "Destroy Demogorgon"]
+//    let defaults = UserDefaults.standard
+
+    let filePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    
+    var itemsModel = [TodoListModel]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let items = defaults.array(forKey: "TodoList") as? [String] {
-            itemArray = items
-        }
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        loadItems()
+//        if let items = defaults.array(forKey: "TodoListModel") as? [TodoListModel] {
+//            itemsModel = items
+//        }
     }
 
     // MARK: - Table view data source
@@ -36,36 +35,35 @@ class ToDoTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return itemArray.count
+        return itemsModel.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoListCell", for: indexPath)
-        cell.textLabel?.text = itemArray[indexPath.row]
+        let currItem = itemsModel[indexPath.row]
+        cell.textLabel?.text = currItem.itemName
+        cell.accessoryType = currItem.checkedFlag ? .checkmark : .none
         return cell
     }
     
     // MARK: - TableView Delegate methods
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print(itemArray[indexPath.row])
-                
-        if (tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark) {
-            tableView.cellForRow(at: indexPath)?.accessoryType = UITableViewCell.AccessoryType.none
-        } else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        }
-        
+        itemsModel[indexPath.row].checkedFlag = !itemsModel[indexPath.row].checkedFlag
+        saveItems()
+//        tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
+        
     }
 
     @IBAction func addNewItem(_ sender: UIBarButtonItem) {
         let alert = UIAlertController(title: "Add New ToDo Item", message: "", preferredStyle: .alert)
         var textEntered = UITextField()
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
-            self.itemArray.append(textEntered.text!)
-            self.defaults.set(self.itemArray, forKey: "TodoList")
-            self.tableView.reloadData()
+            self.itemsModel.append(TodoListModel(itemName: textEntered.text!, checkedFlag: false))
+            self.saveItems()
+//            self.defaults.set(self.itemsModel, forKey: "TodoListModel")
+//            self.tableView.reloadData()
         }
         
         alert.addTextField { (alertTextField) in
@@ -75,6 +73,35 @@ class ToDoTableViewController: UITableViewController {
         
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
+    }
+    
+    func saveItems() {
+        let encoder = PropertyListEncoder()
+        
+        do {
+            let data = try encoder.encode(itemsModel)
+            try data.write(to: filePath!)
+        } catch {
+            print("Error is found \(error)")
+        }
+        
+        self.tableView.reloadData()
+    }
+    
+    func loadItems() {
+        do {
+            let data = try Data(contentsOf: filePath!)
+            let decoder = PropertyListDecoder()
+            do {
+                itemsModel = try decoder.decode([TodoListModel].self, from: data)
+            }
+            catch {
+                print("error decoding \(error)")
+            }
+        } catch {
+            print("error here is \(error)")
+        }
+        
     }
     
     /*

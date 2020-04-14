@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct TodoListModel {
+struct TodoListModel: Codable {
     var itemName: String
     var checkedFlag: Bool
 }
